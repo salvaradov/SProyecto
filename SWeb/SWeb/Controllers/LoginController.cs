@@ -1,18 +1,52 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SWeb.Models;
 
 namespace SWeb.Controllers
 {
     public class LoginController : Controller
     {
-        public IActionResult InicioSesion()
+        private readonly IHttpClientFactory _httpClient;
+        public LoginController(IHttpClientFactory httpClient)
         {
-            return View();
+            _httpClient = httpClient;
         }
 
+        [HttpGet]
         public IActionResult CrearCuenta()
         {
             return View();
         }
+
+        [HttpPost]
+        public IActionResult CrearCuenta(Usuario model)
+        {
+            using (var client = _httpClient.CreateClient())
+            {
+                var url = "https://localhost:7081/api/Login/CrearCuenta";
+                JsonContent datos = JsonContent.Create(model); //serializacion objeto -> Json
+                
+                var response = client.PostAsync(url, datos).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = response.Content.ReadFromJsonAsync<Usuario>().Result; //deserializacion json -> objeto
+                }
+            }
+            
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult InicioSesion()
+        {
+            return View();
+        }
+        [HttpPost]
+        public IActionResult InicioSesion(Usuario model)
+        {
+            return View();
+        }
+
 
         public IActionResult RecuperarAcceso()
         {
